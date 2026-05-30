@@ -1,6 +1,8 @@
 {
-  "framework": "nextjs",
-  "buildCommand": "next build",
-  "devCommand": "next dev",
-  "installCommand": "npm install"
+  "builds": [
+    {
+      "src": "blinks-united/package.json",
+      "use": "@vercel/next"
+    }
+  ]
 }
