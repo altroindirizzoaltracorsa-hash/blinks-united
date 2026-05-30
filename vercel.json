@@ -1,8 +1,8 @@
 {
-  "builds": [
+  "crons": [
     {
-      "src": "blinks-united/package.json",
-      "use": "@vercel/next"
+      "path": "/api/spotify/refresh",
+      "schedule": "0 * * * *"
     }
   ]
 }
