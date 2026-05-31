@@ -1,13 +1,7 @@
 {
-  "builds": [
-    {
-      "src": "blinks-united/package.json",
-      "use": "@vercel/next"
-    }
-  ],
   "crons": [
     {
-      "path": "/api/streams?cron=1",
+      "path": "/api/streams/refresh",
       "schedule": "0 * * * *"
     }
   ]
