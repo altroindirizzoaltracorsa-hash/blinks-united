@@ -27,15 +27,14 @@ export async function GET(req: NextRequest) {
   const userId = searchParams.get('state')
   const error  = searchParams.get('error')
 
-  const origin    = new URL(req.url).origin
-  const dashboard = new URL('/dashboard', origin)
+  const dashboard  = new URL('/dashboard', 'https://blinks-united.vercel.app')
 
   if (error || !code || !userId) {
     dashboard.searchParams.set('error', 'spotify_auth')
     return NextResponse.redirect(dashboard)
   }
 
-  const redirectUri = `${origin}/api/spotify/callback`
+  const redirectUri = 'https://blinks-united.vercel.app/api/spotify/callback'
   const tokens      = await exchangeCode(code, redirectUri)
 
   if (!tokens.access_token) {
