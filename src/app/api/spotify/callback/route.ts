@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSpotifyUser } from '@/lib/spotify'
 import { supabaseAdmin } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 const CLIENT_ID     = process.env.SPOTIFY_CLIENT_ID!
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET!
 const REDIRECT_URI  = 'https://blinks-united.vercel.app/api/spotify/callback'
