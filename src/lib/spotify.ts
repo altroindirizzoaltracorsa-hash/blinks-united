@@ -53,10 +53,11 @@ export async function refreshAccessToken(refreshToken: string) {
 }
 
 export async function getSpotifyUser(accessToken: string) {
-  const res = await fetch('https://api.spotify.com/v1/me', {
+  const res  = await fetch('https://api.spotify.com/v1/me', {
     headers: { Authorization: `Bearer ${accessToken}` },
   })
-  return res.json()
+  const text = await res.text()
+  try { return JSON.parse(text) } catch { return { error: text.slice(0, 200) } }
 }
 
 export async function getRecentlyPlayed(accessToken: string, after: number) {
