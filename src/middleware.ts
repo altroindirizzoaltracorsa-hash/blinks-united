@@ -8,9 +8,9 @@ const isPublic = createRouteMatcher([
   '/api/streams/refresh(.*)',
 ])
 
-export default clerkMiddleware(async (auth, request) => {
+export default clerkMiddleware((auth, request) => {
   if (!isPublic(request)) {
-    await auth.protect()
+    auth().protect()
   }
 })
 
