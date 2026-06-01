@@ -48,7 +48,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(dashboard)
   }
 
-  await supabaseAdmin.from('spotify_accounts').upsert(
+  // Ensure profile exists before inserting spotify_accounts (FK constraint)
+  await supabaseAdmin.from('profiles').upsert(
+    { id: userId, username: userId.slice(5, 13) },
+    { onConflict: 'id', ignoreDuplicates: true },
+  )
+
+  const { error: upsertError } = await supabaseAdmin.from('spotify_accounts').upsert(
     {
       user_id:         userId,
       spotify_user_id: spotifyUser.id,
@@ -60,6 +66,12 @@ export async function GET(req: NextRequest) {
     },
     { onConflict: 'user_id,spotify_user_id' },
   )
+
+  if (upsertError) {
+    console.error('spotify_accounts upsert error:', upsertError)
+    dashboard.searchParams.set('error', 'db_error')
+    return NextResponse.redirect(dashboard)
+  }
 
   dashboard.searchParams.set('success', 'spotify_linked')
   return NextResponse.redirect(dashboard)
