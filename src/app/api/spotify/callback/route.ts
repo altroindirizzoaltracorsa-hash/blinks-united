@@ -21,7 +21,8 @@ async function exchangeCode(code: string) {
       redirect_uri: REDIRECT_URI,
     }),
   })
-  return res.json()
+  const text = await res.text()
+  try { return JSON.parse(text) } catch { return { error: text.slice(0, 200) } }
 }
 
 export async function GET(req: NextRequest) {
