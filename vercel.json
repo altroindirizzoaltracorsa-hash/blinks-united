@@ -1,8 +1,0 @@
-{
-  "crons": [
-    {
-      "path": "/api/streams/refresh",
-      "schedule": "0 0 * * *"
-    }
-  ]
-}
