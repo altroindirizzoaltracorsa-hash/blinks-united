@@ -1,6 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { exchangeCode, getSpotifyUser } from '@/lib/spotify'
+import { getSpotifyUser } from '@/lib/spotify'
 import { supabaseAdmin } from '@/lib/supabase'
+
+const CLIENT_ID     = process.env.SPOTIFY_CLIENT_ID!
+const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET!
+
+async function exchangeCode(code: string, redirectUri: string) {
+  const res = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type':  'application/x-www-form-urlencoded',
+      'Authorization': `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
+    },
+    body: new URLSearchParams({
+      grant_type:   'authorization_code',
+      code,
+      redirect_uri: redirectUri,
+    }),
+  })
+  return res.json()
+}
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl
@@ -8,14 +27,17 @@ export async function GET(req: NextRequest) {
   const userId = searchParams.get('state')
   const error  = searchParams.get('error')
 
-  const dashboard = new URL('/dashboard', req.url)
+  const origin    = new URL(req.url).origin
+  const dashboard = new URL('/dashboard', origin)
 
   if (error || !code || !userId) {
     dashboard.searchParams.set('error', 'spotify_auth')
     return NextResponse.redirect(dashboard)
   }
 
-  const tokens = await exchangeCode(code)
+  const redirectUri = `${origin}/api/spotify/callback`
+  const tokens      = await exchangeCode(code, redirectUri)
+
   if (!tokens.access_token) {
     dashboard.searchParams.set('error', 'spotify_token')
     return NextResponse.redirect(dashboard)

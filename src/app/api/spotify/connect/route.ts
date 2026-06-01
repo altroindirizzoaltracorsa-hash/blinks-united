@@ -1,9 +1,23 @@
 import { auth } from '@clerk/nextjs/server'
-import { getAuthUrl } from '@/lib/spotify'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET() {
-  const { userId } = await auth()
+const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID!
+const SCOPES    = 'user-read-recently-played user-read-private user-read-email'
+
+export async function GET(req: NextRequest) {
+  const { userId } = auth()
   if (!userId) return new NextResponse('Unauthorized', { status: 401 })
-  return NextResponse.redirect(getAuthUrl(userId))
+
+  const origin      = new URL(req.url).origin
+  const redirectUri = `${origin}/api/spotify/callback`
+
+  const params = new URLSearchParams({
+    client_id:     CLIENT_ID,
+    response_type: 'code',
+    redirect_uri:  redirectUri,
+    scope:         SCOPES,
+    state:         userId,
+  })
+
+  return NextResponse.redirect(`https://accounts.spotify.com/authorize?${params}`)
 }
